@@ -14,142 +14,133 @@ from api.v1.views import app_views
                  strict_slashes=False)
 def all_places(city_id):
     """Retrieves all places"""
-    c = s.get(City, city_id)
-    if not c:
+    city = storage.get(City, city_id)
+    if not city:
         abort(404)
-    places = [p.to_dict() for p in c.places]
+    places = [place.to_dict() for place in city.places]
     return jsonify(places)
 
 
 @app_views.route("/places/<place_id>", methods=["GET"], strict_slashes=False)
 def get_place(place_id):
-    """
-    Retrieves place by Id
-    """
-    pl = s.get(Place, place_id)
-    if not pl:
+    """Retrieves place by id"""
+    place = storage.get(Place, place_id)
+    if not place:
         abort(404)
-    return jsonify(pl.to_dict())
+    return jsonify(place.to_dict())
 
 
 @app_views.route("/places/<place_id>", methods=["DELETE"],
                  strict_slashes=False)
 def delete_place(place_id):
-    """
-    Deletes Place
-    """
-    pl = s.get(Place, place_id)
-    if not pl:
+    """Deletes place"""
+    place = storage.get(Place, place_id)
+    if not place:
         abort(404)
-    s.delete(pl)
-    s.save()
+    storage.delete(place)
+    storage.save()
     return jsonify({}), 200
 
 
 @app_views.route("/cities/<city_id>/places", methods=["POST"],
                  strict_slashes=False)
 def create_place(city_id):
-    """
-    Creates a place in City
-    """
-    city = s.get(City, city_id)
+    """Creates a place in city"""
+    city = storage.get(City, city_id)
     if not city:
         abort(404)
-    d = request.get_json()
-    if not d:
+    data = request.get_json()
+    if not data:
         return jsonify({"error": "Not a JSON"}), 400
-    if "user_id" not in d:
+    if "user_id" not in data:
         return jsonify({"error": "Missing user_id"}), 400
-    user = s.get(User, d["user_id"])
+    user = storage.get(User, data["user_id"])
     if not user:
         abort(404)
-    if "name" not in d:
+    if "name" not in data:
         return jsonify({"error": "Missing name"}), 400
-    d["city_id"] = city_id
-    pl = Place(**data)
-    pl.save()
-    return jsonify(pl.to_dict()), 201
+    data["city_id"] = city_id
+    place = Place(**data)
+    place.save()
+    return jsonify(place.to_dict()), 201
 
 
 @app_views.route("/places/<place_id>", methods=["PUT"], strict_slashes=False)
 def update_place(place_id):
-    """
-    Updates a place
-    """
-    place = s.get(Place, place_id)
+    """Updates a place"""
+    place = storage.get(Place, place_id)
     if not place:
         abort(404)
-    d = request.get_json()
-    if not d:
+    data = request.get_json()
+    if not data:
         return jsonify({"error": "Not a JSON"}), 400
-    for key, value in d.items():
+    for key, value in data.items():
         if key not in ["id", "user_id", "city_id", "created_at", "updated_at"]:
-            setattr(pl, key, value)
-    pl.save()
-    return jsonify(pl.to_dict()), 200
+            setattr(place, key, value)
+    place.save()
+    return jsonify(place.to_dict()), 200
 
 
 # Searching
 @app_views.route("/places_search", methods=["POST"],
                  strict_slashes=False)
 def places_search():
-    """
-    Search places
-    """
-    d = request.get_json()
-    if d is None:
+    """Search places"""
+    data = request.get_json()
+
+    if data is None:
         abort(400, "Not a JSON")
 
-   if not d or (not d.get("states") and not
-                    d.get("cities") and not d.get("amenities")):
-        pls = s.all(Place).values()
+    if not data or (not data.get("states") and not
+                    data.get("cities") and not data.get("amenities")):
+        places = storage.all(Place).values()
     else:
-        pls = []
-        if d.get("states"):
-            pls.extend(get_places_from_states(d))
+        places = []
+        if data.get("states"):
+            places.extend(get_places_from_states(data))
 
-        if d.get("cities"):
-            pls = get_places_from_cities(pls, d)
+        if data.get("cities"):
+            places = get_places_from_cities(places, data)
 
-        if d.get("amenities"):
-            if not pls:
-                pls = s.all(Place).values()
-            pls = filter_places_by_amenities(pls, d["amenities"])
+        if data.get("amenities"):
+            if not places:
+                places = storage.all(Place).values()
+            places = filter_places_by_amenities(places, data["amenities"])
     # resolving the unserialized amenities issue
-    pls_dicts = [p.to_dict() for p in pls]
-    for p_dt in pls_dicts:
-        p_dt.pop('amenities', None)
+    places_dicts = [place.to_dict() for place in places]
+    for place_dict in places_dicts:
+        place_dict.pop('amenities', None)
 
-    return jsonify(pls_dicts)
+    return jsonify(places_dicts)
 
 
 def get_places_from_states(data):
-    pls = []
-    for st_id in data["states"]:
-        state = s.get(State, state_id)
+    places = []
+    for state_id in data["states"]:
+        state = storage.get(State, state_id)
         if state:
             for city in state.cities:
                 for place in city.places:
                     if place not in places:
                         places.append(place)
-    return pls
+    return places
 
 
 def get_places_from_cities(places, data):
-    for ct_id in data["cities"]:
-        c = s.get(City, ct_id)
-        if c:
-            for p in city.places:
-                if p not in places:
-                    places.append(p)
+    for city_id in data["cities"]:
+        city = storage.get(City, city_id)
+        if city:
+            for place in city.places:
+                if place not in places:
+                    places.append(place)
     return places
 
 
 def filter_places_by_amenities(places, amenity_ids):
-    amenities = [s.get(Amenity, am_id)
-                 for am_id in amenity_ids]
+    amenities = [storage.get(Amenity, amenity_id)
+                 for amenity_id in amenity_ids]
     return [
         place
         for place in places
-        if all(am in place.amenities for am in amenities)
+        if all(amenity in place.amenities for amenity in amenities)
     ]
