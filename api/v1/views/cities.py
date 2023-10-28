@@ -45,7 +45,7 @@ def create_city(state_id):
     state = s.get(State, state_id)
     if not state:
         abort(404)
-    jsodata = request.get_json()
+    js_data = request.get_json()
     if not js_data:
         return jsonify({"error": "Not a JSON"}), 400
     if "name" not in js_data:
