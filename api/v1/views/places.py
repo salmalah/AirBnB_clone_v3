@@ -3,7 +3,7 @@
 from flask import jsonify, abort, request
 from models.user import User
 from models.place import Place
-from models import storage as s
+from models import storage
 from models.city import City
 from models.state import State
 from models.amenity import Amenity
