@@ -14,7 +14,7 @@ app = Flask(__name__)
 app.register_blueprint(app_views)
 
 # Cross-Origin Resource Sharing
-cors = CORS(app, resources={"/*": {"origins": "0.0.0.0"}})
+CORS(app, origins="0.0.0.0")
 
 
 @app.errorhandler(404)
