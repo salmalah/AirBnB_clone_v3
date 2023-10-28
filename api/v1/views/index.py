@@ -32,4 +32,4 @@ def stats_route():
             "states": storage.count(State),
             "users": storage.count(User),
         }
-        return jsonify(statistics )
+        return jsonify(statistics)
