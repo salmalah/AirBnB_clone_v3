@@ -9,7 +9,7 @@ from models import storage as s
 @app_views.route("/users", methods=["GET"], strict_slashes=False)
 def all_users():
     """Retrieves all users"""
-    users = [u.to_dict() for u in storage.all(User).values()]
+    users = [u.to_dict() for u in s.all(User).values()]
     return jsonify(users)
 
 
@@ -41,13 +41,12 @@ def get_user(user_id):
 def delete_user(user_id):
     """Deletes User"""
     u = s.get(User, user_id)
-    if user:
+    if u:
         s.delete(u)
         s.save()
         return jsonify({}), 200
     abort(404)
-
-
+    
 
 @app_views.route("/users/<user_id>", methods=["PUT"], strict_slashes=False)
 def update_user(user_id):
