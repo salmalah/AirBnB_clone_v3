@@ -46,7 +46,7 @@ def delete_user(user_id):
         s.save()
         return jsonify({}), 200
     abort(404)
-    
+
 
 @app_views.route("/users/<user_id>", methods=["PUT"], strict_slashes=False)
 def update_user(user_id):
