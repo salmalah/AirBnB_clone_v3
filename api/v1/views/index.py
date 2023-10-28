@@ -24,7 +24,7 @@ def status_route():
 def stats_route():
     """retrieves the number of each objects by type"""
     if request.method == "GET":
-        statistics  = {
+        statistics = {
             "amenities": storage.count(Amenity),
             "cities": storage.count(City),
             "places": storage.count(Place),
