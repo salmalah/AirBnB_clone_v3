@@ -141,4 +141,4 @@ def filter_places_by_amenities(places, amenity_ids):
         place
         for place in places
         if all(amenity in place.amenities for amenity in amenities)
-    ]
+            ]
