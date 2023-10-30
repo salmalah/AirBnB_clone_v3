@@ -1,7 +1,5 @@
 #!/usr/bin/python3
-"""
-Flask Routes for Status and Statistics
-"""
+"""Flask Api index"""
 from api.v1.views import app_views
 from models.review import Review
 from flask import jsonify, request
@@ -15,14 +13,14 @@ from models.state import State
 
 @app_views.route("/status", methods=["GET"])
 def status_route():
-    """returns status route ok for GET"""
+    """Returns the status"""
     if request.method == "GET":
         return jsonify({"status": "OK"})
 
 
 @app_views.route("/stats", methods=["GET"])
-def stats_route():
-    """retrieves the number of each objects by type"""
+def get_stats_route():
+    """Retrieves the number of each objects by type"""
     if request.method == "GET":
         statistics = {
             "amenities": storage.count(Amenity),

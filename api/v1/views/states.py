@@ -1,7 +1,5 @@
 #!/usr/bin/python3
-"""
-CRUD Operations for States
-"""
+"""Api states"""
 from flask import jsonify, abort, request
 from models.state import State
 from api.v1.views import app_views
@@ -10,13 +8,13 @@ from models import storage as s
 
 @app_views.route("/states", methods=["GET"], strict_slashes=False)
 def get_states():
-    """Retrieve a list of all State"""
+    """Retrieves a list of all State object"""
     states = s.all(State).values()
     return jsonify([n.to_dict() for n in states])
 
 
 @app_views.route("/states/<state_id>", methods=["GET"], strict_slashes=False)
-def get_state_by_id(state_id):
+def get_state_id(state_id):
     """Retrieve a State object by its ID"""
     state = s.get(State, state_id)
     if not state:

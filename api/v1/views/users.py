@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Users CRUD Operations"""
+"""APi users"""
 from models.user import User
 from flask import jsonify, abort, request
 from api.v1.views import app_views
@@ -7,7 +7,7 @@ from models import storage as s
 
 
 @app_views.route("/users", methods=["GET"], strict_slashes=False)
-def all_users():
+def get_all_users():
     """Retrieves all users"""
     users = [u.to_dict() for u in s.all(User).values()]
     return jsonify(users)
@@ -30,7 +30,7 @@ def create_user():
 
 @app_views.route("/users/<user_id>", methods=["GET"], strict_slashes=False)
 def get_user(user_id):
-    """Retrieves user by id"""
+    """Retrieves user by its id"""
     user = s.get(User, user_id)
     if user:
         return jsonify(user.to_dict())
@@ -39,7 +39,7 @@ def get_user(user_id):
 
 @app_views.route("/users/<user_id>", methods=["DELETE"], strict_slashes=False)
 def delete_user(user_id):
-    """Deletes User"""
+    """Deletes User by its id"""
     user = s.get(User, user_id)
     if user:
         s.delete(user)

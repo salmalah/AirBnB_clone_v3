@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-""" Place_aminities """
+""" APi Place_aminities """
 from flask import jsonify, abort, request
 from models import storage
 from models.place import Place
@@ -10,8 +10,8 @@ from os import getenv
 
 @app_views.route("/places/<place_id>/amenities", methods=["GET"],
                  strict_slashes=False)
-def retrive_amenities_of_place(place_id):
-    """returns list of amenities in a place"""
+def get_amenities_of_place(place_id):
+    """Returns list of all amenities in a place"""
     place = storage.get(Place, place_id)
     if not place:
         abort(404)
@@ -32,7 +32,7 @@ def retrive_amenities_of_place(place_id):
     strict_slashes=False,
 )
 def delete_amenity_in_place(place_id, amenity_id):
-    """delete aminity in a place"""
+    """Deletes aminity in a place"""
     place = storage.get(Place, place_id)
     amenity = storage.get(Amenity, amenity_id)
     if not place or not amenity:
@@ -53,8 +53,8 @@ def delete_amenity_in_place(place_id, amenity_id):
     "/places/<place_id>/amenities/<amenity_id>", methods=["POST"],
     strict_slashes=False
 )
-def link_amenity_to_place(place_id, amenity_id):
-    """link amenity to place"""
+def link_place_amenity(place_id, amenity_id):
+    """links amenity to place"""
     place = storage.get(Place, place_id)
     amenity = storage.get(Amenity, amenity_id)
     if not place or not amenity:

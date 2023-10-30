@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-""" Flask Application """
+""" Flask Api Application """
 from models import storage
 from flask_cors import CORS
 from os import environ
@@ -20,15 +20,12 @@ def close_storage(error):
 
 @app.errorhandler(404)
 def not_found_error(error):
-    """
-    Handles 404 errors by returning a JSON-formatted response
-    content : {"error": "Not found"}
-    """
+    """Handles a modified 404 error page"""
     return jsonify(error="Not found"), 404
 
 
 if __name__ == "__main__":
-    """ Run the Flask server """
+    """ Runs the Flask server """
     H = environ.get('HBNB_API_HOST')
     if not H:
         host = '0.0.0.0'

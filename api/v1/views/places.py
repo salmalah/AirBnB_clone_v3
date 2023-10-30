@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-""" Places CRUD """
+"""APi places"""
 from flask import jsonify, abort, request
 from models import storage
 from models.city import City
@@ -12,7 +12,7 @@ from models.amenity import Amenity
 
 @app_views.route("/cities/<city_id>/places", methods=["GET"],
                  strict_slashes=False)
-def all_places(city_id):
+def get_all_places(city_id):
     """Retrieves all places"""
     city = storage.get(City, city_id)
     if not city:
@@ -23,7 +23,7 @@ def all_places(city_id):
 
 @app_views.route("/places/<place_id>", methods=["GET"], strict_slashes=False)
 def get_place(place_id):
-    """Retrieves place by id"""
+    """Retrieves place object with its id"""
     place = storage.get(Place, place_id)
     if not place:
         abort(404)
@@ -33,7 +33,7 @@ def get_place(place_id):
 @app_views.route("/places/<place_id>", methods=["DELETE"],
                  strict_slashes=False)
 def delete_place(place_id):
-    """Deletes place"""
+    """Deletes place with its id"""
     place = storage.get(Place, place_id)
     if not place:
         abort(404)
@@ -67,7 +67,7 @@ def create_place(city_id):
 
 @app_views.route("/places/<place_id>", methods=["PUT"], strict_slashes=False)
 def update_place(place_id):
-    """Updates a place"""
+    """Updates a place by its id"""
     place = storage.get(Place, place_id)
     if not place:
         abort(404)
@@ -81,7 +81,6 @@ def update_place(place_id):
     return jsonify(place.to_dict()), 200
 
 
-# Searching
 @app_views.route("/places_search", methods=["POST"],
                  strict_slashes=False)
 def places_search():
@@ -106,7 +105,6 @@ def places_search():
             if not places:
                 places = storage.all(Place).values()
             places = filter_places_by_amenities(places, data["amenities"])
-    # resolving the unserialized amenities issue
     places_dicts = [place.to_dict() for place in places]
     for place_dict in places_dicts:
         place_dict.pop('amenities', None)
